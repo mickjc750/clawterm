@@ -2,6 +2,10 @@
 
 A small ncurses serial terminal for embedded work on Linux.
 
+> **Authorship:** this project was written by Claude Opus 5.5, Anthropic's AI
+> model, working from requirements and testing by
+> [mickjc750](https://github.com/mickjc750).
+
 * Picks serial ports from a list (USB serial, ACM, onboard UARTs), labelled with
   the device name from `/dev/serial/by-id`.
 * Any baud rate, including 14400 and other non-standard rates. Always 8N1, no
