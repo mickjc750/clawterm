@@ -1064,6 +1064,7 @@ static void handle_key(int ch)
 	case KEY_NPAGE:  scroll_off = scroll_off > page ? scroll_off - page : 0; dirty = 1; return;
 	case KEY_END:    scroll_off = 0; dirty = 1; return;
 	case KEY_RESIZE: got_winch = 1; dirty = 1; return;
+	case KEY_MOUSE:  return;   /* never transmit mouse events */
 	case '\n': case '\r': case KEY_ENTER:
 		queue_out(eol_seqs[cfg.eol], strlen(eol_seqs[cfg.eol]));
 		return;
@@ -1155,6 +1156,13 @@ int main(int argc, char **argv)
 	noecho();
 	keypad(stdscr, TRUE);
 	nodelay(stdscr, TRUE);
+	/* Turn off the terminal's "alternate scroll" mode (DECSET 1007).
+	 * With it on, the terminal turns mouse wheel motion into Up/Down
+	 * arrow keys, which would be transmitted to the serial port. The
+	 * mouse itself is left to the terminal so click-and-drag still
+	 * selects and copies text. */
+	putp("\033[?1007l");
+	fflush(stdout);
 	curs_set(0);
 	if (has_colors()) {
 		start_color();
@@ -1192,6 +1200,9 @@ int main(int argc, char **argv)
 	}
 
 	endwin();
+	/* give the wheel back to other full-screen programs (less, vim) */
+	putp("\033[?1007h");
+	fflush(stdout);
 	rx_end_line();
 	if (fd >= 0)
 		close(fd);
